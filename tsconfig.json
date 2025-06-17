@@ -1,0 +1,43 @@
+{
+  "compilerOptions": {
+    /* Language and Environment */
+    "target": "ES2020", // Updated target for better compatibility
+    "lib": ["DOM", "DOM.Iterable", "ESNext"], // Added standard libs
+    "jsx": "react-jsx", // Common for React projects
+
+    /* Modules */
+    "module": "ESNext", // Use ESNext for modern module handling
+    "moduleResolution": "bundler", // Recommended for modern bundlers like Vite
+    "baseUrl": ".", // Set base URL for path resolution
+    "paths": {
+      "@/*": ["src/*"] // Define the @ alias to point to src/
+    },
+    "resolveJsonModule": true, // Allow importing JSON files
+
+    /* JavaScript Support */
+    "allowJs": true, // Allow JS files
+
+    /* Emit */
+    "noEmit": true, // Let the bundler (Vite) handle emit
+
+    /* Interop Constraints */
+    "isolatedModules": true, // Ensure files can be transpiled independently
+    "allowSyntheticDefaultImports": true, // For compatibility
+    "esModuleInterop": true, // Standard interop setting
+    "forceConsistentCasingInFileNames": true, // Enforce casing
+
+    /* Type Checking */
+    "strict": true, // Enable strict checks
+    "noUnusedLocals": true, // Catch unused variables
+    "noUnusedParameters": true, // Catch unused parameters
+    "noFallthroughCasesInSwitch": true, // Prevent switch fallthrough bugs
+    "noImplicitAny": false, // Allow implicit any for now to reduce initial errors, can be tightened later
+    "strictNullChecks": false, // Allow null/undefined for now, can be tightened later
+
+    /* Completeness */
+    "skipLibCheck": true // Skip checking library files
+  },
+  "include": ["src", "**/*.ts", "**/*.tsx"] // Include src directory and TS/TSX files
+  // Removed "references" field
+}
+
