@@ -1,5 +1,5 @@
 import { AxiosError } from 'axios';
-import { api } from './api';
+import { axiosInstance } from './api';
 
 export class AppError extends Error {
   constructor(
@@ -149,7 +149,7 @@ class ErrorHandler {
     this.errorQueue = [];
 
     try {
-      await api.post('/logs/errors', { errors: errorsToSend });
+      await axiosInstance.post('/logs/errors', { errors: errorsToSend });
     } catch (error) {
       // If sending fails, put errors back in queue
       this.errorQueue = [...errorsToSend, ...this.errorQueue];
