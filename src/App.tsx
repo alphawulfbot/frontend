@@ -7,6 +7,7 @@ import Wallet from './pages/Wallet';
 import Friends from './pages/Friends';
 import Games from './pages/Games';
 import { useStore } from './store';
+import { useAuthStore } from './store/auth';
 
 declare global {
   interface Window {
@@ -22,6 +23,7 @@ declare global {
             username?: string;
           };
         };
+        expand?: () => void;
       };
     };
   }
@@ -29,14 +31,38 @@ declare global {
 
 function App() {
   const initTelegramWebApp = useStore((state) => state.initTelegramWebApp);
+  const { isAuthenticated, login, isLoading } = useAuthStore();
 
   useEffect(() => {
     // Initialize Telegram WebApp
     if (window.Telegram?.WebApp) {
       window.Telegram.WebApp.ready();
+      if (window.Telegram.WebApp.expand) {
+        window.Telegram.WebApp.expand();
+      }
       initTelegramWebApp();
     }
   }, [initTelegramWebApp]);
+
+  useEffect(() => {
+    // Auto-login with Telegram if not authenticated
+    if (
+      !isAuthenticated &&
+      window.Telegram?.WebApp?.initData &&
+      window.Telegram.WebApp.initData !== ''
+    ) {
+      login(window.Telegram.WebApp.initData);
+    }
+  }, [isAuthenticated, login]);
+
+  if (!isAuthenticated || isLoading) {
+    // Show a loading spinner or message while logging in
+    return (
+      <div className="flex min-h-screen items-center justify-center bg-background text-text">
+        <span className="text-xl font-bold">Logging in with Telegram...</span>
+      </div>
+    );
+  }
 
   return (
     <Router>
