@@ -1,10 +1,17 @@
 import { motion } from 'framer-motion';
 import { useStore } from '../store';
+import { useAuthStore } from '../store/auth';
+
+const TELEGRAM_BOT_USERNAME = 'alphawolftesting_bot'; // <-- Set your bot username here
 
 const Friends = () => {
   const { friends } = useStore();
+  const { user } = useAuthStore();
 
-  const referralCode = 'ALPHA123';
+  const referralCode = user?.referral_code || '';
+  const referralLink = referralCode
+    ? `https://t.me/${TELEGRAM_BOT_USERNAME}?start=${referralCode}`
+    : '';
 
   return (
     <div className="py-4">
@@ -15,47 +22,53 @@ const Friends = () => {
       </div>
 
       <div className="card p-4 mb-6">
-        <h3 className="text-lg font-bold mb-3">Your Referral Code</h3>
+        <h3 className="text-lg font-bold mb-3">Your Referral Link</h3>
         <div className="flex items-center justify-between bg-gray-800 p-3 rounded">
-          <span className="text-xl font-mono">{referralCode}</span>
-          <motion.button
-            className="text-[#ffd700] hover:text-white transition-colors"
-            whileHover={{ scale: 1.1 }}
-            whileTap={{ scale: 0.9 }}
-            onClick={() => navigator.clipboard.writeText(referralCode)}
-          >
-            <i className="fas fa-copy"></i>
-          </motion.button>
+          <span className="text-xs font-mono break-all">{referralLink || 'No referral code available'}</span>
+          {referralLink && (
+            <motion.button
+              className="text-[#ffd700] hover:text-white transition-colors"
+              whileHover={{ scale: 1.1 }}
+              whileTap={{ scale: 0.9 }}
+              onClick={() => navigator.clipboard.writeText(referralLink)}
+            >
+              <i className="fas fa-copy"></i>
+            </motion.button>
+          )}
         </div>
         <p className="text-sm text-gray-400 mt-2">
-          Share this code with friends to earn 100 coins for each referral
+          Share this link with friends to earn 100 coins for each referral
         </p>
       </div>
 
       <div className="space-y-4">
         <h3 className="text-lg font-bold">Your Friends</h3>
-        {friends.map((friend, index) => (
-          <motion.div
-            key={friend.id}
-            className="card p-4"
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: index * 0.1 }}
-          >
-            <div className="flex items-center justify-between">
-              <div>
-                <h4 className="font-bold">{friend.username}</h4>
-                <p className="text-sm text-gray-400">
-                  Level: {friend.level} • Joined: {friend.joinedDate}
-                </p>
+        {friends.length === 0 ? (
+          <p className="text-sm text-gray-400">You have no friends yet. Invite some!</p>
+        ) : (
+          friends.map((friend, index) => (
+            <motion.div
+              key={friend.id}
+              className="card p-4"
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: index * 0.1 }}
+            >
+              <div className="flex items-center justify-between">
+                <div>
+                  <h4 className="font-bold">{friend.username}</h4>
+                  <p className="text-sm text-gray-400">
+                    Level: {friend.level} • Joined: {friend.joinedDate}
+                  </p>
+                </div>
+                <div className="text-right">
+                  <p className="text-[#ffd700] font-bold">{friend.coins} coins</p>
+                  <p className="text-xs text-gray-400">Earned</p>
+                </div>
               </div>
-              <div className="text-right">
-                <p className="text-[#ffd700] font-bold">{friend.coins} coins</p>
-                <p className="text-xs text-gray-400">Earned</p>
-              </div>
-            </div>
-          </motion.div>
-        ))}
+            </motion.div>
+          ))
+        )}
       </div>
 
       <div className="mt-6 text-center">

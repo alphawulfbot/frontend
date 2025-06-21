@@ -1,24 +1,30 @@
-import { useState } from 'react';
-import { motion } from 'framer-motion';
+import { useEffect, useState } from 'react';
 import { useStore } from '../store';
+import { coinsAPI, withdrawalsAPI, TransactionsResponse, HistoryResponse } from '../services/api';
 
 const Wallet = () => {
   const { coinBalance } = useStore();
-  const [selectedAmount, setSelectedAmount] = useState<number | null>(null);
+  const [transactions, setTransactions] = useState<any[]>([]);
+  const [withdrawals, setWithdrawals] = useState<any[]>([]);
+  const [loading, setLoading] = useState(true);
 
-  const withdrawalOptions = [
-    { amount: 1000, coins: 1000 },
-    { amount: 2000, coins: 2000 },
-    { amount: 5000, coins: 5000 },
-    { amount: 10000, coins: 10000 }
-  ];
-
-  const handleWithdraw = () => {
-    if (selectedAmount && coinBalance >= selectedAmount) {
-      // Implement withdrawal logic here
-      console.log(`Withdrawing ${selectedAmount} coins`);
-    }
-  };
+  useEffect(() => {
+    const fetchData = async () => {
+      setLoading(true);
+      try {
+        const txRes = await coinsAPI.getTransactions();
+        setTransactions(txRes.data.transactions || []);
+        const wdRes = await withdrawalsAPI.getHistory();
+        setWithdrawals(wdRes.data.history || []);
+      } catch (e) {
+        setTransactions([]);
+        setWithdrawals([]);
+      } finally {
+        setLoading(false);
+      }
+    };
+    fetchData();
+  }, []);
 
   return (
     <div className="py-4">
@@ -29,64 +35,45 @@ const Wallet = () => {
       </div>
 
       <div className="space-y-4">
-        <h3 className="text-lg font-bold text-center">Withdraw Coins</h3>
-        
-        <div className="grid grid-cols-2 gap-4">
-          {withdrawalOptions.map((option) => (
-            <motion.button
-              key={option.amount}
-              className={`card p-4 text-center ${
-                selectedAmount === option.coins ? 'border-2 border-[#ffd700]' : ''
-              }`}
-              onClick={() => setSelectedAmount(option.coins)}
-              whileHover={{ scale: 1.02 }}
-              whileTap={{ scale: 0.98 }}
-            >
-              <p className="text-lg font-bold">{option.amount} INR</p>
-              <p className="text-sm text-gray-400">{option.coins} coins</p>
-            </motion.button>
-          ))}
-        </div>
-
-        <motion.button
-          className={`withdraw-btn w-full ${
-            !selectedAmount || coinBalance < selectedAmount ? 'disabled' : ''
-          }`}
-          onClick={handleWithdraw}
-          disabled={!selectedAmount || coinBalance < selectedAmount}
-          whileHover={selectedAmount && coinBalance >= selectedAmount ? { scale: 1.02 } : {}}
-          whileTap={selectedAmount && coinBalance >= selectedAmount ? { scale: 0.98 } : {}}
-        >
-          {!selectedAmount
-            ? 'Select an amount'
-            : coinBalance < selectedAmount
-            ? 'Insufficient balance'
-            : 'Withdraw Now'}
-        </motion.button>
+        <h3 className="text-lg font-bold text-center">Withdrawals</h3>
+        {loading ? (
+          <p className="text-center text-gray-400">Loading...</p>
+        ) : withdrawals.length === 0 ? (
+          <p className="text-center text-gray-400">No withdrawals yet.</p>
+        ) : (
+          <div className="space-y-2">
+            {withdrawals.map((wd, idx) => (
+              <div key={idx} className="card p-3 flex justify-between items-center">
+                <div>
+                  <p className="font-bold">Withdrawal</p>
+                  <p className="text-sm text-gray-400">{wd.date || wd.createdAt || ''}</p>
+                </div>
+                <p className="text-[#ffd700]">-{wd.amount} coins</p>
+              </div>
+            ))}
+          </div>
+        )}
       </div>
 
       <div className="mt-8">
         <h3 className="text-lg font-bold text-center mb-4">Transaction History</h3>
-        <div className="space-y-2">
-          <div className="card p-3">
-            <div className="flex justify-between items-center">
-              <div>
-                <p className="font-bold">Withdrawal</p>
-                <p className="text-sm text-gray-400">2024-02-20</p>
+        {loading ? (
+          <p className="text-center text-gray-400">Loading...</p>
+        ) : transactions.length === 0 ? (
+          <p className="text-center text-gray-400">No transactions yet.</p>
+        ) : (
+          <div className="space-y-2">
+            {transactions.map((tx, idx) => (
+              <div key={idx} className="card p-3 flex justify-between items-center">
+                <div>
+                  <p className="font-bold">{tx.type || 'Transaction'}</p>
+                  <p className="text-sm text-gray-400">{tx.date || tx.createdAt || ''}</p>
+                </div>
+                <p className="text-[#ffd700]">{tx.amount > 0 ? '+' : ''}{tx.amount} coins</p>
               </div>
-              <p className="text-[#ffd700]">-1000 coins</p>
-            </div>
+            ))}
           </div>
-          <div className="card p-3">
-            <div className="flex justify-between items-center">
-              <div>
-                <p className="font-bold">Task Reward</p>
-                <p className="text-sm text-gray-400">2024-02-19</p>
-              </div>
-              <p className="text-[#ffd700]">+50 coins</p>
-            </div>
-          </div>
-        </div>
+        )}
       </div>
     </div>
   );

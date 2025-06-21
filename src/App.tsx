@@ -33,6 +33,16 @@ function App() {
   const initTelegramWebApp = useStore((state) => state.initTelegramWebApp);
   const { isAuthenticated, login, isLoading } = useAuthStore();
 
+  // Restrict access to Telegram only
+  const isTelegram = typeof window !== 'undefined' && !!window.Telegram?.WebApp;
+  if (!isTelegram) {
+    return (
+      <div className="flex min-h-screen items-center justify-center bg-background text-text">
+        <span className="text-xl font-bold">This app is only accessible via Telegram.</span>
+      </div>
+    );
+  }
+
   useEffect(() => {
     // Initialize Telegram WebApp
     if (window.Telegram?.WebApp) {

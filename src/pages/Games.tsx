@@ -4,6 +4,7 @@ import { useStore } from '../store';
 const Games = () => {
   const { coinBalance } = useStore();
 
+  // This is the official list of available games. To add more, update here or fetch from backend in the future.
   const games = [
     {
       title: 'Lucky Spin',
@@ -42,6 +43,7 @@ const Games = () => {
         <h2 className="text-xl font-bold text-[#ffd700] mb-2">Games</h2>
         <p className="text-3xl font-bold">{coinBalance} coins</p>
         <p className="text-sm text-gray-400 mt-1">Available to play</p>
+        <p className="text-xs text-gray-400 mt-2">This is the official list of games available in Alpha Wulf.</p>
       </div>
 
       <div className="grid grid-cols-2 gap-4">
