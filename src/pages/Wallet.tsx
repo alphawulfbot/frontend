@@ -1,22 +1,25 @@
 import { useEffect, useState } from 'react';
 import { useStore } from '../store';
-import { coinsAPI, withdrawalsAPI, TransactionsResponse, HistoryResponse } from '../services/api';
+import { coinsAPI, withdrawalsAPI } from '../services/api';
 
 const Wallet = () => {
   const { coinBalance } = useStore();
   const [transactions, setTransactions] = useState<any[]>([]);
   const [withdrawals, setWithdrawals] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState('');
 
   useEffect(() => {
     const fetchData = async () => {
       setLoading(true);
+      setError('');
       try {
         const txRes = await coinsAPI.getTransactions();
         setTransactions(txRes.data.transactions || []);
         const wdRes = await withdrawalsAPI.getHistory();
         setWithdrawals(wdRes.data.history || []);
       } catch (e) {
+        setError('Failed to load wallet data.');
         setTransactions([]);
         setWithdrawals([]);
       } finally {
@@ -38,6 +41,8 @@ const Wallet = () => {
         <h3 className="text-lg font-bold text-center">Withdrawals</h3>
         {loading ? (
           <p className="text-center text-gray-400">Loading...</p>
+        ) : error ? (
+          <p className="text-center text-red-500">{error}</p>
         ) : withdrawals.length === 0 ? (
           <p className="text-center text-gray-400">No withdrawals yet.</p>
         ) : (
@@ -59,6 +64,8 @@ const Wallet = () => {
         <h3 className="text-lg font-bold text-center mb-4">Transaction History</h3>
         {loading ? (
           <p className="text-center text-gray-400">Loading...</p>
+        ) : error ? (
+          <p className="text-center text-red-500">{error}</p>
         ) : transactions.length === 0 ? (
           <p className="text-center text-gray-400">No transactions yet.</p>
         ) : (

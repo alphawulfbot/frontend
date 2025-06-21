@@ -7,30 +7,30 @@ const Games = () => {
   // This is the official list of available games. To add more, update here or fetch from backend in the future.
   const games = [
     {
-      title: 'Lucky Spin',
-      description: 'Spin the wheel to win coins',
-      icon: 'dice',
+      title: 'Memory Match',
+      description: 'Match pairs to win coins',
+      icon: 'brain',
       minBet: 100,
       maxReward: 1000
     },
     {
-      title: 'Coin Flip',
-      description: 'Double your coins or lose them all',
-      icon: 'coins',
+      title: 'Quick Tap',
+      description: 'Tap targets quickly',
+      icon: 'bolt',
       minBet: 50,
       maxReward: 500
     },
     {
-      title: 'Memory Match',
-      description: 'Test your memory and win coins',
-      icon: 'brain',
+      title: 'Number Puzzle',
+      description: 'Solve the puzzle',
+      icon: 'puzzle-piece',
       minBet: 200,
       maxReward: 2000
     },
     {
-      title: 'Coming Soon',
-      description: 'More exciting games on the way',
-      icon: 'gamepad',
+      title: 'Wolf Run',
+      description: 'Endless runner game',
+      icon: 'running',
       minBet: 0,
       maxReward: 0,
       disabled: true

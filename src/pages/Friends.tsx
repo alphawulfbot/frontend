@@ -58,11 +58,11 @@ const Friends = () => {
                 <div>
                   <h4 className="font-bold">{friend.username}</h4>
                   <p className="text-sm text-gray-400">
-                    Level: {friend.level} • Joined: {friend.joinedDate}
+                    Level: {friend.level} • Joined: {(friend as any).joinedDate || (friend as any).created_at}
                   </p>
                 </div>
                 <div className="text-right">
-                  <p className="text-[#ffd700] font-bold">{friend.coins} coins</p>
+                  <p className="text-[#ffd700] font-bold">{(friend as any).coins ?? (friend as any).balance} coins</p>
                   <p className="text-xs text-gray-400">Earned</p>
                 </div>
               </div>
