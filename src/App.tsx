@@ -1,5 +1,5 @@
+import React, { useEffect, useState } from 'react';
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
-import { useEffect } from 'react';
 import MainLayout from './components/layout/MainLayout';
 import Home from './pages/Home';
 import Earn from './pages/Earn';
@@ -9,64 +9,66 @@ import Games from './pages/Games';
 import { useStore } from './store';
 import { useAuthStore } from './store/auth';
 
-declare global {
-  interface Window {
-    Telegram: {
-      WebApp: {
-        ready: () => void;
-        initData: string;
-        initDataUnsafe: {
-          user?: {
-            id: number;
-            first_name: string;
-            last_name?: string;
-            username?: string;
-          };
-        };
-        expand?: () => void;
-      };
-    };
-  }
+const TELEGRAM_BOT_LINK = 'https://t.me/alphawolftesting_bot';
+
+function TelegramLoginPage() {
+  return (
+    <div className="flex min-h-screen items-center justify-center bg-background text-text flex-col">
+      <span className="text-xl font-bold mb-4">Login with Telegram to continue</span>
+      <a
+        href={TELEGRAM_BOT_LINK}
+        target="_blank"
+        rel="noopener noreferrer"
+        className="px-6 py-3 bg-[#229ED9] text-white rounded-lg text-lg font-bold hover:bg-[#176b8a] transition-colors"
+      >
+        Open Telegram Bot
+      </a>
+      <p className="mt-4 text-gray-400">If you don't have Telegram, download it and start the bot to use Alpha Wulf.</p>
+    </div>
+  );
 }
 
 function App() {
-  // Telegram-only access check (must be first)
-  if (typeof window !== 'undefined' && !window.Telegram?.WebApp) {
-    return (
-      <div className="flex min-h-screen items-center justify-center bg-background text-text">
-        <span className="text-xl font-bold">This app is only accessible via Telegram.</span>
-      </div>
-    );
-  }
-
-  // Hooks and logic after the block check
+  const [isTelegram, setIsTelegram] = useState<boolean | null>(null);
   const initTelegramWebApp = useStore((state) => state.initTelegramWebApp);
   const { isAuthenticated, login, isLoading } = useAuthStore();
 
   useEffect(() => {
-    // Initialize Telegram WebApp
-    if (window.Telegram?.WebApp) {
+    setIsTelegram(!!window.Telegram?.WebApp);
+  }, []);
+
+  useEffect(() => {
+    if (isTelegram && window.Telegram?.WebApp) {
       window.Telegram.WebApp.ready();
       if (window.Telegram.WebApp.expand) {
         window.Telegram.WebApp.expand();
       }
       initTelegramWebApp();
     }
-  }, [initTelegramWebApp]);
+  }, [isTelegram, initTelegramWebApp]);
 
   useEffect(() => {
-    // Auto-login with Telegram if not authenticated
     if (
+      isTelegram &&
       !isAuthenticated &&
       window.Telegram?.WebApp?.initData &&
       window.Telegram.WebApp.initData !== ''
     ) {
       login(window.Telegram.WebApp.initData);
     }
-  }, [isAuthenticated, login]);
+  }, [isTelegram, isAuthenticated, login]);
+
+  if (isTelegram === null) {
+    // Still checking
+    return null;
+  }
+
+  if (!isTelegram) {
+    // Not in Telegram: show login page with Telegram bot link
+    return <TelegramLoginPage />;
+  }
 
   if (!isAuthenticated || isLoading) {
-    // Show a loading spinner or message while logging in
     return (
       <div className="flex min-h-screen items-center justify-center bg-background text-text">
         <span className="text-xl font-bold">Logging in with Telegram...</span>
