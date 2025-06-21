@@ -30,9 +30,8 @@ declare global {
 }
 
 function App() {
-  // Telegram-only access check
-  const isTelegram = typeof window !== 'undefined' && !!window.Telegram?.WebApp;
-  if (!isTelegram) {
+  // Telegram-only access check (must be first)
+  if (typeof window !== 'undefined' && !window.Telegram?.WebApp) {
     return (
       <div className="flex min-h-screen items-center justify-center bg-background text-text">
         <span className="text-xl font-bold">This app is only accessible via Telegram.</span>
@@ -40,6 +39,7 @@ function App() {
     );
   }
 
+  // Hooks and logic after the block check
   const initTelegramWebApp = useStore((state) => state.initTelegramWebApp);
   const { isAuthenticated, login, isLoading } = useAuthStore();
 
