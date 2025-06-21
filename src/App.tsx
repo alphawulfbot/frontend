@@ -30,10 +30,7 @@ declare global {
 }
 
 function App() {
-  const initTelegramWebApp = useStore((state) => state.initTelegramWebApp);
-  const { isAuthenticated, login, isLoading } = useAuthStore();
-
-  // Restrict access to Telegram only
+  // Telegram-only access check
   const isTelegram = typeof window !== 'undefined' && !!window.Telegram?.WebApp;
   if (!isTelegram) {
     return (
@@ -42,6 +39,9 @@ function App() {
       </div>
     );
   }
+
+  const initTelegramWebApp = useStore((state) => state.initTelegramWebApp);
+  const { isAuthenticated, login, isLoading } = useAuthStore();
 
   useEffect(() => {
     // Initialize Telegram WebApp
