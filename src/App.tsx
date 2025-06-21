@@ -29,14 +29,19 @@ function TelegramLoginPage() {
 }
 
 function App() {
-  const [isTelegram, setIsTelegram] = useState<boolean | null>(null);
+  const [checkedTelegram, setCheckedTelegram] = useState(false);
+  const [isTelegram, setIsTelegram] = useState(false);
   const initTelegramWebApp = useStore((state) => state.initTelegramWebApp);
   const { isAuthenticated, login, isLoading } = useAuthStore();
 
+  // Check for Telegram WebApp on mount
   useEffect(() => {
-    setIsTelegram(!!window.Telegram?.WebApp);
+    const isTg = !!window.Telegram?.WebApp;
+    setIsTelegram(isTg);
+    setCheckedTelegram(true);
   }, []);
 
+  // Initialize Telegram WebApp if present
   useEffect(() => {
     if (isTelegram && window.Telegram?.WebApp) {
       window.Telegram.WebApp.ready();
@@ -47,6 +52,7 @@ function App() {
     }
   }, [isTelegram, initTelegramWebApp]);
 
+  // Attempt auto-login if in Telegram and not authenticated
   useEffect(() => {
     if (
       isTelegram &&
@@ -58,16 +64,17 @@ function App() {
     }
   }, [isTelegram, isAuthenticated, login]);
 
-  if (isTelegram === null) {
-    // Still checking
+  // While checking for Telegram, show nothing
+  if (!checkedTelegram) {
     return null;
   }
 
+  // If not in Telegram, always show login page
   if (!isTelegram) {
-    // Not in Telegram: show login page with Telegram bot link
     return <TelegramLoginPage />;
   }
 
+  // If in Telegram but not authenticated, show loading
   if (!isAuthenticated || isLoading) {
     return (
       <div className="flex min-h-screen items-center justify-center bg-background text-text">
@@ -76,6 +83,7 @@ function App() {
     );
   }
 
+  // Only after Telegram and authentication, show main app
   return (
     <Router>
       <MainLayout>
