@@ -5,7 +5,7 @@ import { securityService } from './security';
 // Minimal test export
 export const testExportValue = "TEST_VALUE";
 
-const API_URL = 'https://backend-m664.onrender.com';
+const API_URL = process.env.REACT_APP_API_URL || 'https://backend-m664.onrender.com';
 
 // --- Exported Types ---
 export interface UserProfile {
